@@ -57,7 +57,7 @@ Here's a sound routine that always plays noise and ignores all music data:
 
 ```c
 void noise(int *row, void (*out)(unsigned char)) {
-	out(rand() % 2);
+  out(rand() % 2);
 }
 ```
 
@@ -82,9 +82,9 @@ If you have added a new engine - choose a single-byte identifier for it (it can 
 ```c
 static void set_engine(char c) {
   switch (c) {
-		...
+    ...
     case 'Z': engine = zero; break;
-		...
+    ...
   }
 }
 ```
@@ -112,7 +112,7 @@ Engine One is a bit more advanced. It can support 2 PWM channels, and click drum
 ```
 ; Note1 Note2 Drums FX
   C-4   C-5   03    15
-	---   D-5   00    00
+  ---   D-5   00    00
 ```
 
 Notes are obvious. Drums are short click samples, values from 1 to 5 are allowed.
