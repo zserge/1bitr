@@ -1,0 +1,23 @@
+; 1 (for Engine One, a dual-channel PWM with a few effects)
+
+; Not really a melody, just some noise
+
+C-4 0 1 ff
+C-2 0 0 31
+G-4 0 0 0
+C-5 0 0 21
+
+C-4 C-4 1 44
+C-1 G-2 0 32
+G-4 D-5 0 0
+C-5 C-4 0 0
+
+C-4 0 1 44
+C-1 0 0 32
+G-4 0 0 0
+C-5 0 0 0
+
+C-4 0 3 44
+C-1 0 0 32
+G-4 0 0 0
+C-5 0 0 0
