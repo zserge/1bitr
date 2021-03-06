@@ -1,3 +1,6 @@
+; 0 (for Engine Zero, a single-channel PWM with adjustable tempo)
+
+; Just a boring C-major scale played with Engine 0
 C-4
 D-4
 E-4
