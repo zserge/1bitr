@@ -206,7 +206,7 @@ int main(int argc, const char *argv[]) {
 
     if (c == '\n' || c == ' ') {
       if (wordptr > word) {
-        unsigned char n = 0;
+        unsigned int n = 0;
         if ((word[0] >= 'A' && word[0] <= 'H') &&
             (word[1] == '-' || word[1] == '#') &&
             (word[2] >= '1' && word[2] <= '7')) {
@@ -217,6 +217,8 @@ int main(int argc, const char *argv[]) {
           while (p--) f *= 1.0595;
           /* C-1 would be 32.7Hz, n would be note period in samples */
           n = (SAMPLE_RATE * 10 / 327) / f;
+        } else if (word[0] == '-') {
+          n = 0;
         } else {
           n = strtol(word, &wordptr, 16);
           if (*wordptr != '\0') {
