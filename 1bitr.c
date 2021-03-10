@@ -51,8 +51,63 @@ static struct backend playback = {
     alsa_write,
 };
 #elif __APPLE__
-#include <AudioUnit/AudioUnit.h>
-/* TODO */
+#include <AudioToolbox/AudioQueue.h>
+#define NUM_BUFFERS 2
+#define BUFSZ 4096
+static dispatch_semaphore_t sem_drained, sem_full;
+static unsigned char buf[BUFSZ];
+static unsigned int bufpos = 0;
+
+void callback(void *custom_data, AudioQueueRef queue,
+              AudioQueueBufferRef buffer) {
+	(void) custom_data;
+  dispatch_semaphore_wait(sem_full, DISPATCH_TIME_FOREVER);
+  memmove(buffer->mAudioData, buf, sizeof(buf));
+  dispatch_semaphore_signal(sem_drained);
+  AudioQueueEnqueueBuffer(queue, buffer, 0, NULL);
+}
+
+static int coreaudio_start() {
+	AudioQueueRef queue;
+  AudioStreamBasicDescription format = {0};
+  format.mSampleRate = SAMPLE_RATE;
+  format.mFormatID = kAudioFormatLinearPCM;
+  format.mBitsPerChannel = 8;
+  format.mFramesPerPacket = 1;
+  format.mChannelsPerFrame = 1;
+  format.mBytesPerPacket = 1;
+  format.mBytesPerFrame = 1;
+  sem_drained = dispatch_semaphore_create(1);
+  sem_full = dispatch_semaphore_create(0);
+  AudioQueueNewOutput(&format, callback, NULL, NULL, NULL, 0, &queue);
+  for (int i = 0; i < NUM_BUFFERS; i++) {
+    AudioQueueBufferRef buffer;
+    AudioQueueAllocateBuffer(queue, BUFSZ, &buffer);
+    buffer->mAudioDataByteSize = BUFSZ;
+    memset(buffer->mAudioData, 0, buffer->mAudioDataByteSize);
+    AudioQueueEnqueueBuffer(queue, buffer, 0, NULL);
+  }
+  AudioQueueStart(queue, NULL);
+  return 0;
+}
+
+static void coreaudio_stop() {
+  dispatch_semaphore_wait(sem_drained, NSEC_PER_SEC);
+}
+static void coreaudio_write(unsigned char c) {
+  buf[bufpos++] = c ? 0x10 : 0;
+  if (bufpos >= sizeof(buf)) {
+    bufpos = 0;
+    dispatch_semaphore_signal(sem_full);
+    dispatch_semaphore_wait(sem_drained, DISPATCH_TIME_FOREVER);
+  }
+}
+
+static struct backend playback = {
+    coreaudio_start,
+    coreaudio_stop,
+    coreaudio_write,
+};
 #endif
 
 /* WAV file backend, used when stdout is redirected into a file */
