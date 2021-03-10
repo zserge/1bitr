@@ -7,7 +7,7 @@ ifeq ($(shell uname -s),Linux)
 	LDLIBS += -lasound
 endif
 ifeq ($(shell uname -s),Darwin)
-	LDFLAGS += -framework CoreAudio
+	LDFLAGS += -framework AudioToolbox -framework CoreFoundation
 endif
 endif
 
